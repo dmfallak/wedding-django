@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-class Guest
+class Guest(models.Model):
   invitee = models.CharField(max_length=256)
   attending_max = models.IntegerField(default=0)
   attending_num = models.IntegerField(default=0)
@@ -14,4 +14,6 @@ class Guest
   shuttle_from_time = models.IntegerField(default=0)
   attending = models.BooleanField(default=False)
   responded = models.BooleanField(default=False)
-  
+
+  def __str__(self):
+    return self.invitee
