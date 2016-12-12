@@ -4,16 +4,8 @@ import json
 import pprint
 from .models import Guest
 
-# Create your views here.
-def guests(request):
-  print json.dumps(request.GET)
-  if request.GET.get('filter[invitee]'):
-    invitee = request.GET.get('filter[invitee]')
-    obj_set = Guest.objects.filter(invitee=invitee)
-
-    if obj_set.count() == 1:
-      obj = obj_set.first()
-      result = {'data': {
+def guest_to_json(obj):
+  result = {'data': {
             'type': 'guest',
             'id': obj.id,
             'attributes': {
@@ -32,6 +24,16 @@ def guests(request):
           }
         }
 
+  return json.dumps(result)
+
+def guests(request):
+  print json.dumps(request.GET)
+  if request.GET.get('filter[invitee]'):
+    invitee = request.GET.get('filter[invitee]')
+    obj = Guest.objects.get(invitee=invitee)
+
+    if obj:
+      result = guest_to_json(obj)
       status = 200
 
     else:
@@ -43,6 +45,7 @@ def guests(request):
           }
         ]}
 
+      result = json.dumps(result)
       status = 404
 
   else:
@@ -54,12 +57,31 @@ def guests(request):
           }
         ]}
 
+    result = json.dumps(result)
+
     status = 404
 
-  return HttpResponse(json.dumps(result),
+  return HttpResponse(result,
       content_type="application/json", status=status)
 
 
-def guests_by_id(request):
-  # nothing
-  return
+def guests_by_id(request, guest_id):
+  obj = Guest.objects.get(id=guest_id)
+  
+  if obj:
+    result = guest_to_json(obj)
+    status = 200
+  else:
+    result = {"errors":[
+        {
+          "title":"Could not find guest for given id.",
+          "code":"API_ERR",
+          "status":"404"
+        }
+      ]}
+
+    result = json.dumps(result)
+    status = 404
+
+  return HttpResponse(result,
+      content_type="application/json", status=status)
