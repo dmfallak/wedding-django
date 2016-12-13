@@ -15,6 +15,7 @@ def guest_to_json(obj):
               'guest-names': obj.guest_names,
               'entree1': obj.entree1,
               'entree2': obj.entree2,
+              'side': obj.side,
               'hotel': obj.hotel,
               'shuttle-to-time': obj.shuttle_to_time,
               'shuttle-from-time': obj.shuttle_from_time,
@@ -28,8 +29,8 @@ def guest_to_json(obj):
 
 def guests(request):
   print json.dumps(request.GET)
-  if request.GET.get('filter[invitee]'):
-    invitee = request.GET.get('filter[invitee]')
+  if request.GET.get('invitee'):
+    invitee = request.GET.get('invitee')
     obj = Guest.objects.get(invitee=invitee)
 
     if obj:
