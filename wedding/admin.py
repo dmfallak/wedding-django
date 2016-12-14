@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Guest, ShuttleFrom, ShuttleTo
+
+admin.site.register(Guest)
+admin.site.register(ShuttleFrom)
+admin.site.register(ShuttleTo)

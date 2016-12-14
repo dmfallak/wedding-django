@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import json
 import pprint
-from .models import Guest
+from .models import Guest, ShuttleFrom, ShuttleTo
 
 def guest_to_json(obj):
   result = {'data': {
@@ -26,6 +26,30 @@ def guest_to_json(obj):
         }
 
   return json.dumps(result)
+
+def shuttle_to_to_json(obj):
+  result = {'type': 'shuttleFrom',
+            'id': obj.id,
+            'attributes': {
+              'time': obj.time,
+              'seats-max': obj.seats_max,
+              'seats-free': obj.seats_free
+            }
+          }
+
+  return result
+
+def shuttle_from_to_json(obj):
+  result = {'type': 'shuttleTo',
+            'id': obj.id,
+            'attributes': {
+              'time': obj.time,
+              'seats-max': obj.seats_max,
+              'seats-free': obj.seats_free
+            }
+          }
+
+  return result
 
 def guests(request):
   print json.dumps(request.GET)
@@ -86,3 +110,24 @@ def guests_by_id(request, guest_id):
 
   return HttpResponse(result,
       content_type="application/json", status=status)
+
+
+def shuttle_froms(request):
+  froms = ShuttleFrom.objects.filter()
+
+  resp_list = []
+
+  for obj in froms:
+    resp_list.append(shuttle_from_to_json(obj))
+
+  return HttpResponse(json.dumps({"data": resp_list}), content_type="application/json")
+
+def shuttle_tos(request):
+  tos = ShuttleTo.objects.filter()
+
+  resp_list = []
+
+  for obj in tos:
+    resp_list.append(shuttle_to_to_json(obj))
+
+  return HttpResponse(json.dumps({"data": resp_list}), content_type="application/json")

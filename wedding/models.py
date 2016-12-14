@@ -18,3 +18,19 @@ class Guest(models.Model):
 
   def __str__(self):
     return self.invitee
+
+class ShuttleFrom(models.Model):
+  time = models.CharField(max_length=32)
+  seats_max = models.IntegerField(default=0)
+  seats_free = models.IntegerField(default=0)
+
+  def __str__(self):
+    return self.time
+
+class ShuttleTo(models.Model):
+  time = models.CharField(max_length=32)
+  seats_max = models.IntegerField(default=0)
+  seats_free = models.IntegerField(default=0)
+
+  def __str__(self):
+    return self.time
