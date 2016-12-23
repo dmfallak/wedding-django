@@ -77,10 +77,10 @@ def guests(request):
   print json.dumps(request.GET)
   if request.GET.get('invitee'):
     invitee = request.GET.get('invitee')
-    obj = Guest.objects.get(invitee=invitee)
+    obj = Guest.objects.filter(invitee=invitee)
 
-    if obj:
-      result = guest_to_json(obj)
+    if obj.count() > 0:
+      result = guest_to_json(obj.first())
       status = 200
 
     else:
