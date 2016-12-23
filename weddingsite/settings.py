@@ -25,7 +25,9 @@ SECRET_KEY = '&$$g!c^^^yrn34t-^=c@2wxxys=7z2ocq3naya#4bg$&uk&z=2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["www.channelleanddevin.com", 
+                 "channelleanddevin.com",
+                 "localhost"]
 
 
 # Application definition
