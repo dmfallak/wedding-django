@@ -187,7 +187,7 @@ def guests_by_id(request, guest_id):
         ]}
 
       result = json.dumps(result)
-      status = 404
+      status = 400
 
     return HttpResponse(result, content_type="application/json", status=status)
 
