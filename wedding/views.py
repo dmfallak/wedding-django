@@ -50,7 +50,7 @@ def json_to_guest(json_string):
   return guest
 
 def shuttle_to_to_json(obj):
-  result = {'type': 'shuttleFrom',
+  result = {'type': 'shuttleTo',
             'id': obj.id,
             'attributes': {
               'time': obj.time,
@@ -62,7 +62,7 @@ def shuttle_to_to_json(obj):
   return result
 
 def shuttle_from_to_json(obj):
-  result = {'type': 'shuttleTo',
+  result = {'type': 'shuttleFrom',
             'id': obj.id,
             'attributes': {
               'time': obj.time,
