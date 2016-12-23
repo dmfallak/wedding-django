@@ -137,22 +137,59 @@ def guests_by_id(request, guest_id):
   elif request.method == 'PATCH':
     body_obj = json.loads(request.body)
 
+    print request.body
+
+
+    shuttle_to_time = int(body_obj['data']['attributes']['shuttle-to-time'])
+    shuttle_from_time = int(body_obj['data']['attributes']['shuttle-from-time'])
+
     obj.invitee = body_obj['data']['attributes']['invitee']
-    obj.attending_max = body_obj['data']['attributes']['attending-max']
-    obj.attending_num = body_obj['data']['attributes']['attending-num']
+    obj.attending_max = int(body_obj['data']['attributes']['attending-max'])
+    obj.attending_num = int(body_obj['data']['attributes']['attending-num'])
     obj.guest_names = body_obj['data']['attributes']['guest-names']
     obj.entree1 = body_obj['data']['attributes']['entree1']
     obj.entree2 = body_obj['data']['attributes']['entree2']
     obj.side = body_obj['data']['attributes']['side']
     obj.hotel = body_obj['data']['attributes']['hotel']
-    obj.shuttle_to_time = body_obj['data']['attributes']['shuttle-to-time']
-    obj.shuttle_from_time = body_obj['data']['attributes']['shuttle-from-time']
+    obj.shuttle_to_time = shuttle_to_time
+    obj.shuttle_from_time = shuttle_from_time
     obj.attending = body_obj['data']['attributes']['attending']
     obj.responded = body_obj['data']['attributes']['responded']
 
-    obj.save()
 
-    return HttpResponse()
+    if shuttle_to_time > 0:
+      shuttle_to_obj = ShuttleTo.objects.filter(id=shuttle_to_time).first()
+      shuttle_to_obj.seats_free = shuttle_to_obj.seats_free - obj.attending_num
+
+    if shuttle_from_time > 0:
+      shuttle_from_obj = ShuttleFrom.objects.filter(id=shuttle_from_time).first()
+      shuttle_from_obj.seats_free = shuttle_from_obj.seats_free - obj.attending_num
+
+    if (shuttle_to_time <= 0 or shuttle_to_obj.seats_free >= 0) and \
+       (shuttle_from_time <= 0 or shuttle_from_obj.seats_free >= 0):
+      result = ""
+      status = 200
+
+      obj.save()
+
+      if shuttle_to_time > 0:
+        shuttle_to_obj.save()
+
+      if shuttle_from_time > 0:
+        shuttle_from_obj.save()
+    else:
+      result = {"errors":[
+          {
+            "title":"Not enough seats on shuttle.",
+            "code":"API_ERR",
+            "status":"400"
+          }
+        ]}
+
+      result = json.dumps(result)
+      status = 404
+
+    return HttpResponse(result, content_type="application/json", status=status)
 
 
 def shuttle_froms(request):
