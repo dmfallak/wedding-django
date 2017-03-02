@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import pprint
 from .models import Guest, ShuttleFrom, ShuttleTo
+import os
+from django.core import serializers
 
 def guest_to_json(obj):
   result = {'data': {
@@ -211,3 +213,51 @@ def shuttle_tos(request):
     resp_list.append(shuttle_to_to_json(obj))
 
   return HttpResponse(json.dumps({"data": resp_list}), content_type="application/json")
+
+
+def summaries(request):
+
+  password = request.GET.get('password')
+
+  print 'given: ' + str(password) + ", expected: " + str(os.environ.get("SUMMARY_PASSWORD"))
+
+  if str(password) == str(os.environ.get("SUMMARY_PASSWORD")):
+    responses = Guest.objects.filter(responded=True)
+    responses = json.loads(serializers.serialize("json", responses))
+    no_response = Guest.objects.filter(responded=False)
+    no_response = json.loads(serializers.serialize("json", no_response))
+
+    responses_fields = []
+
+    for guest in responses:
+      responses_fields.append(guest['fields'])
+
+    no_response_fields = []
+
+    for guest in no_response:
+      no_response_fields.append(guest['fields'])
+
+    result = {'data': {'type': 'summary',
+              'id': 0,
+              'attributes': {
+                'responses': responses_fields,
+                'no-response': no_response_fields,
+                'password': password
+              }
+            }
+          }
+    result = json.dumps(result)
+    status = 200
+  else:
+    result = {"errors":[
+        {
+          "title":"Incorrect password.",
+          "code":"API_ERR",
+          "status":"401"
+        }
+      ]}
+
+    result = json.dumps(result)
+    status = 401
+
+  return HttpResponse(result, content_type="application/json", status=status)
