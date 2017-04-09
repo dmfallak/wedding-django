@@ -214,12 +214,9 @@ def shuttle_tos(request):
 
   return HttpResponse(json.dumps({"data": resp_list}), content_type="application/json")
 
-
 def summaries(request):
 
   password = request.GET.get('password')
-
-  print 'given: ' + str(password) + ", expected: " + str(os.environ.get("SUMMARY_PASSWORD"))
 
   if str(password) == str(os.environ.get("SUMMARY_PASSWORD")):
     responses = Guest.objects.filter(responded=True)
@@ -261,3 +258,104 @@ def summaries(request):
     status = 401
 
   return HttpResponse(result, content_type="application/json", status=status)
+
+def guests_by_shuttle_from_id(request, shuttle_id):
+  password = request.GET.get('password')
+
+  if str(password) != str(os.environ.get("SUMMARY_PASSWORD")):
+    result = {"errors":[
+        {
+          "title":"Incorrect password.",
+          "code":"API_ERR",
+          "status":"401"
+        }
+      ]}
+
+    result = json.dumps(result)
+    status = 401
+
+    return HttpResponse(result, content_type="application/json", status=status)
+
+  guests = Guest.objects.filter(shuttle_to_time=shuttle_id)
+  output_guests = []
+
+  if request.method == 'GET':
+    for obj in guests:
+      guest = json.loads(guest_to_json(obj))
+      output_guests.append(guest)
+
+    return HttpResponse(json.dumps(output_guests), content_type="application/json", status=200)
+  else:
+    return HttpResponse(json.dumps({"errors":[{"title":"invalid request type","status":"400"}]}), 
+      content_type='application/json', status=400)
+
+def guests_by_shuttle_to_id(request, shuttle_id):
+  password = request.GET.get('password')
+
+  if str(password) != str(os.environ.get("SUMMARY_PASSWORD")):
+    result = {"errors":[
+        {
+          "title":"Incorrect password.",
+          "code":"API_ERR",
+          "status":"401"
+        }
+      ]}
+
+    result = json.dumps(result)
+    status = 401
+
+    return HttpResponse(result, content_type="application/json", status=status)
+
+  guests = Guest.objects.filter(shuttle_from_time=shuttle_id)
+  output_guests = []
+
+  if request.method == 'GET':
+    for obj in guests:
+      guest = json.loads(guest_to_json(obj))
+      output_guests.append(guest)
+
+    return HttpResponse(json.dumps(output_guests), content_type="application/json", status=200)
+  else:
+    return HttpResponse(json.dumps({"errors":[{"title":"invalid request type","status":"400"}]}), 
+      content_type='application/json', status=400)
+
+def shuttles(request):
+  password = request.GET.get('password')
+
+  if str(password) != str(os.environ.get("SUMMARY_PASSWORD")):
+    result = {"errors":[
+        {
+          "title":"Incorrect password.",
+          "code":"API_ERR",
+          "status":"401"
+        }
+      ]}
+
+    result = json.dumps(result)
+    status = 401
+
+    return HttpResponse(result, content_type="application/json", status=status)
+
+  shuttle_tos = []
+  shuttle_froms = []
+
+  for i in range(1, 5):
+    shuttle_to_guests = Guest.objects.filter(shuttle_from_time=i)
+    shuttle_from_guests = Guest.objects.filter(shuttle_from_time=i)
+
+    shuttle_to_output=[]
+    shuttle_from_output = []
+
+    for obj in shuttle_to_guests:
+      guest = json.loads(guest_to_json(obj))
+      shuttle_to_output.append(guest)
+
+    for obj in shuttle_from_guests:
+      guest = json.loads(guest_to_json(obj))
+      shuttle_from_output.append(guest)
+
+    shuttle_tos.append(shuttle_to_output)
+    shuttle_froms.append(shuttle_from_output)
+
+  return HttpResponse(json.dumps({"shuttle_tos":shuttle_tos, "shuttle_froms":shuttle_froms}), 
+    content_type="application/json", status=200)
