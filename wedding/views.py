@@ -340,7 +340,7 @@ def shuttles(request):
   shuttle_froms = []
 
   for i in range(1, 5):
-    shuttle_to_guests = Guest.objects.filter(shuttle_from_time=i)
+    shuttle_to_guests = Guest.objects.filter(shuttle_to_time=i)
     shuttle_from_guests = Guest.objects.filter(shuttle_from_time=i)
 
     shuttle_to_output=[]
