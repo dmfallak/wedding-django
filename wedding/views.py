@@ -76,7 +76,7 @@ def shuttle_from_to_json(obj):
   return result
 
 def guests(request):
-  print json.dumps(request.GET)
+  print(json.dumps(request.GET))
   if request.GET.get('invitee'):
     invitee = request.GET.get('invitee')
     obj = Guest.objects.filter(invitee=invitee)
@@ -139,7 +139,7 @@ def guests_by_id(request, guest_id):
   elif request.method == 'PATCH':
     body_obj = json.loads(request.body)
 
-    print request.body
+    print(request.body)
 
 
     shuttle_to_time = int(body_obj['data']['attributes']['shuttle-to-time'])
