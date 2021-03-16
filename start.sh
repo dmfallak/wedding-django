@@ -1,3 +1,2 @@
 #!/bin/bash
-source setenv.sh
-nohup /usr/bin/python manage.py runserver 0.0.0.0:8080 --noreload&
+nohup docker run --env-file env.list -p 8080:8080 wedding-django > nohup.out &
